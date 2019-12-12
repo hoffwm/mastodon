@@ -1,0 +1,46 @@
+reset
+######## Define Variables: ######
+#{soil_x = 48}
+#{soil_y = 48}
+#{soil_z = 48}
+#{block_x = 6}
+#{block_y = 6}
+#{block_z = 6}
+#{soil_mesh_size = 4}
+#{block_mesh_size = 1}
+
+# Create Geometry:
+create brick x {soil_x} y {soil_y} z {soil_z}
+create brick x {block_x} y {block_y} z {block_z}
+move volume 2 x 0 y 0 z {(soil_z+block_z)/2}
+surface 8 copy scale 1.5
+surface 13 move x 0 y 0 z {-0.25*soil_z}
+imprint volume 1 with curve 25 28 27 26
+delete surface 13
+
+
+
+# Mesh volumes:
+volume 1 size {soil_mesh_size}
+volume 2 size {block_mesh_size}
+mesh volume 1 2
+volume all move x 0 y 0 z {soil_z/2}
+
+# Assign IDs
+sideset 1 add surface 2 3 4 5 6
+sideset 1 name 'outer_soil_surfaces'
+sideset 2 add surface 8
+sideset 2 name 'block_contact_surface'
+sideset 3 add surface 14
+sideset 3 name 'soil_contact_surface'
+sideset 4 add surface 7
+sideset 4 name 'block_top_surface'
+block 1 add volume 1
+block 1 name 'soil'
+block 2 add volume 2
+block 2 name 'concrete_block'
+nodeset 10 add volume 2
+nodeset 10 name 'concrete_block_all_nodes'
+
+# Export
+export genesis 'mesh.e' overwrite
